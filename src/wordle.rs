@@ -12,11 +12,35 @@ enum Color {
 }
 
 impl Wordle {
-    pub fn new(word: String, dictionary: Vec<String>) -> Wordle {
+    pub fn new(dictionary: Vec<String>) -> Wordle {
         return Wordle {
-            word,
+            word: String::from("never"),
             dictionary,
         }
+    }
+
+    pub fn play(&mut self) -> bool {
+        self.word = self.dictionary.choose(&mut rand::thread_rng()).unwrap().clone();
+        println!("The secret word is: {}", self.word);
+
+        let mut guess_counter: i32 = 0;
+        let mut result = false;
+
+        while guess_counter < 6 {
+            result = self.guess();
+            guess_counter += 1;
+            if result == true {
+                break;
+            }
+        }
+
+        if result {
+            println!("Word: {} guessed in {} tries.", self.word, guess_counter);
+        } else {
+            println!("Failed to guess word: {} in 6 tries.", self.word);
+        }
+
+        result
     }
 
     pub fn guess(&mut self) -> bool {
@@ -54,7 +78,7 @@ impl Wordle {
         for i in 0..5 {
             match colors[i] {
                 Color::RED => {
-                    if word_chars[i] == guess_chars[i] {
+                    if word_chars.contains(&guess_chars[i]) {
                         result = false;
                         break;
                     }
